@@ -1,0 +1,122 @@
+# Caso de estudo multimodelo: familia Cessna 172, 14 V e 28 V. LINHAS DE BASE COM DADOS DO FABRICANTE.
+#
+# MODELO 14 V (172M 1976): Service Manual 1969-76, Change 5, "Electrical Load Analysis Chart",
+#   p. 16-37/16-38 (PDF p. 285-286), coluna 1976. Alternador 14 V 60 A (16-38, PDF p. 253);
+#   bateria 12 V ~25 Ah (16-15, PDF p. 246).
+# MODELO 28 V (172R/172S painel convencional): Maintenance Manual 172 (1996 & on), 172RMM rev. 15,
+#   24-70-00 "Electrical Load Analysis", Tables 1 e 2, coluna 28 VDC (PDF p. 394-397).
+#   Bateria 24 V 12,75 Ah na taxa de 5 h (PDF p. 352; opcional 15,5 Ah, PDF p. 361), convertida para a
+#   taxa de 1 h por 85 % (CASA AC 21-38 v2.1, 4.5.12.2): 12,75 × 0,85 = 10,8375 Ah. Alternador 60 A (PDF p. 397, nota I).
+#   Ciclo de TX: 1 min a cada 10 min = 0,1 (nota J); COM 2 sempre em recepcao (nota K).
+#
+# INSTALACAO: GTN 650 + GMA 345 + GTX 345 + G5, correntes MAXIMAS da Garmin (conservador).
+#   Manuais na pasta "Installation Manuals 650xi":
+#   GTN 650: 190-01007-A3 Rev 4 (GTN 6XX/7XX AML STC IM), Table 1-5 (PDF p. 35); disjuntores Fig. E-4 (PDF p. 303)
+#   GMA 345: 190-01878-02 Rev 6, Table 1-7; disjuntor 5 A recomendado
+#   GTX 345: 190-01499-02 Rev 9, Table 1-12
+#   G5:      190-01112-10 Rev 28, Table 1-4; disjuntor 5 A (3.2.1)
+#   O procedimento da Garmin (GTN IM 3.7.2, nota [1] da Fig. 3-14) manda usar a corrente TIPICA;
+#   aqui usamos a MAXIMA e comparamos as duas em dados_C172.md.
+#
+# METODO v2 (docs/revisao_fundamentacao.md): cls = continuous/intermittent (AC 43.13-1B 11-35; Cessna 1976
+#   'running load'); current_batt_a = coluna 24 V do 172RMM para a emergencia (CASA AC 21-38 v2.1 4.4.3.11).
+# PREMISSAS (declarar no artigo; analise de sensibilidade): composicao do painel, ciclos de trabalho
+#   por fase, voo noturno como pior caso, cargas mantidas apos load shed, Peukert n, SOH, fator de temperatura.
+
+aml:
+  - model: "Cessna 172M 1976 (14 V)"
+    tcds: "FAA 3A12"
+    cert_basis: "CAR 3 (confirmar no TCDS 3A12)"
+    voltage: 14
+    battery_v: 12
+    alternator_a: 60
+    source: "Service Manual 1969-76: 16-38 (alternador), 16-15 (bateria), 16-37/38 (ELA)"
+    battery: {capacity_ah: 22.0, chemistry: lead-acid, peukert_n: 1.2, soh: 0.8, soc: 0.9, temp_factor: 1.0, capacity_scenarios: true}  # Concorde RG-25, 22 Ah C1 (IEC 60952-1); reposicao listada para 172 A-M/N; Cessna original ~25 Ah sem taxa (SM 16-15)
+    buses: [{name: main}, {name: avionics}]
+    required_endurance_min: 30
+    baseline_loads:
+      - {name: battery contactor, bus: main, current_a: 0.6, duty: {ground: 1, taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}, source: "SM 16-37"}
+      - {name: fuel indicators, bus: main, current_a: 0.4, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}, source: "SM 16-37"}
+      - {name: flashing beacon, bus: main, current_a: 7.0, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1}, source: "SM 16-37"}
+      - {name: instrument lights, bus: main, current_a: 1.3, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}, source: "SM 16-37 (noite)"}
+      - {name: position lights, bus: main, current_a: 5.6, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}, source: "SM 16-37 (noite)"}
+      - {name: turn coordinator, bus: main, current_a: 0.8, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}, source: "SM 16-37"}
+      - {name: flap position indicator, bus: main, current_a: 0.1, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}, source: "SM 16-37"}
+      - {name: strobe lights, bus: main, current_a: 4.0, duty: {takeoff_climb: 1, cruise: 1, landing: 1}, source: "SM 16-37"}
+      - {name: nav/com 1 RT-328T, bus: avionics, current_a: 1.5, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}, source: "SM 16-37", radio: com1}
+      - {name: COM 1 legado TX, bus: avionics, current_a: 6.0, duty: {taxi: 0.1, takeoff_climb: 0.1, cruise: 0.1, landing: 0.1, emergency: 0.1}, source: "TX nao consta da tabela 1976; valor e duty do 172RMM 24-70-00 nota J (KX 155A)", cls: intermittent, radio: com1}
+      - {name: nav/com 2 RT-308C, bus: avionics, current_a: 1.5, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1}, source: "SM 16-37"}
+      - {name: transponder RT-359A, bus: avionics, current_a: 1.0, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}, source: "SM 16-37"}
+      - {name: encoding altimeter EA-401A, bus: avionics, current_a: 0.065, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}, source: "SM 16-37"}
+      - {name: ADF R-546E, bus: avionics, current_a: 1.0, duty: {takeoff_climb: 1, cruise: 1, landing: 1}, source: "SM 16-37"}
+      - {name: glideslope R-443B, bus: avionics, current_a: 0.4, duty: {landing: 1}, source: "SM 16-37"}
+      - {name: marker beacon R-402A, bus: avionics, current_a: 0.3, duty: {landing: 1}, source: "SM 16-37"}
+      - {name: autopilot AF-295B, bus: avionics, current_a: 2.0, duty: {cruise: 1}, source: "SM 16-37"}
+      - {name: flap motor, bus: main, current_a: 15.0, breaker_a: 15, duty: {takeoff_climb: 0.05, landing: 0.1, emergency: 0.02}, source: "SM 16-38; duty assumido", cls: intermittent}
+      - {name: landing and taxi light, bus: main, current_a: 20.0, duty: {taxi: 0.5, takeoff_climb: 1, landing: 1}, source: "SM 16-38; duty assumido", cls: intermittent}
+      - {name: courtesy and dome lights, bus: main, current_a: 2.5, duty: {ground: 1}, source: "SM 16-38", cls: intermittent}
+      - {name: map light, bus: main, current_a: 0.33, duty: {cruise: 0.3, landing: 0.3}, source: "SM 16-38; duty assumido", cls: intermittent}
+
+  - model: "Cessna 172R/S convencional (28 V)"
+    tcds: "FAA 3A12"
+    cert_basis: "14 CFR 23 (confirmar emenda no TCDS 3A12)"
+    voltage: 28
+    battery_v: 24
+    alternator_a: 60
+    source: "172RMM rev 15: 24-70-00 (ELA, PDF p. 394-397), 24-30 (bateria, PDF p. 352, 361)"
+    battery: {capacity_ah: 10.8375, chemistry: lead-acid, peukert_n: 1.2, soh: 0.8, soc: 0.9, temp_factor: 1.0}
+    buses: [{name: main}, {name: avionics}, {name: essential, essential: true}]
+    required_endurance_min: 30
+    baseline_loads:
+      # Table 1 (todos os avioes), coluna 28 VDC
+      - {name: landing light 4596, bus: main, current_a: 8.93, duty: {takeoff_climb: 1, landing: 1}, source: "172RMM 24-70-00 T1", cls: intermittent, current_batt_a: 7.65}
+      - {name: taxi light 4587, bus: main, current_a: 8.93, duty: {taxi: 1}, source: "172RMM 24-70-00 T1", cls: intermittent, current_batt_a: 7.65}
+      - {name: navigation lights, bus: main, current_a: 3.1, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}, source: "172RMM 24-70-00 T1 (noite)", current_batt_a: 2.65}
+      - {name: wing anti-collision lights, bus: main, current_a: 1.7, duty: {takeoff_climb: 1, cruise: 1, landing: 1}, source: "172RMM 24-70-00 T1 (media)", current_batt_a: 1.98}
+      - {name: beacon light, bus: main, current_a: 1.25, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1}, source: "172RMM 24-70-00 T1 (pico)", current_batt_a: 1.07}
+      - {name: under wing courtesy lights, bus: main, current_a: 1.14, duty: {ground: 1}, source: "172RMM 24-70-00 T1", cls: intermittent, current_batt_a: 0.98}
+      - {name: map light, bus: main, current_a: 0.09, duty: {cruise: 0.3, landing: 0.3}, source: "172RMM 24-70-00 T1; duty assumido", cls: intermittent, current_batt_a: 0.08}
+      - {name: instrument lights (10 x 0.02), bus: main, current_a: 0.2, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}, source: "172RMM 24-70-00 T1; quantidade assumida"}
+      - {name: pedestal light, bus: main, current_a: 0.05, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1}, source: "172RMM 24-70-00 T1", current_batt_a: 0.04}
+      - {name: flap motor, bus: main, current_a: 2.4, duty: {takeoff_climb: 0.05, landing: 0.1, emergency: 0.02}, source: "172RMM 24-70-00 T1; duty assumido", cls: intermittent, current_batt_a: 2.06}
+      - {name: pitot heat, bus: main, current_a: 3.89, duty: {cruise: 0.3}, source: "172RMM 24-70-00 T1; duty assumido", current_batt_a: 3.33}
+      - {name: hourmeter, bus: main, current_a: 0.02, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1}, source: "172RMM 24-70-00 T1", current_batt_a: 0.01}
+      - {name: battery relay coil, bus: main, current_a: 0.33, duty: {ground: 1, taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}, source: "172RMM 24-70-00 T1", current_batt_a: 0.29}
+      - {name: alternator relay coil, bus: main, current_a: 0.33, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1}, source: "172RMM 24-70-00 T1", current_batt_a: 0.29}
+      - {name: alternator field and ACU, bus: main, current_a: 1.9, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1}, source: "172RMM 24-70-00 T1, nota I (max)", current_batt_a: 1.63}
+      - {name: ACU bus sense, bus: main, current_a: 0.02, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1}, source: "172RMM 24-70-00 T1", current_batt_a: 0.02}
+      - {name: autopilot KAP 140 computer, bus: avionics, current_a: 0.5, duty: {cruise: 1}, source: "172RMM 24-70-00 T1", current_batt_a: 0.58}
+      - {name: pitch servo and clutch, bus: avionics, current_a: 0.5, duty: {cruise: 1}, source: "172RMM 24-70-00 T1", current_batt_a: 0.58}
+      - {name: pitch trim servo and clutch, bus: avionics, current_a: 0.5, duty: {cruise: 1}, source: "172RMM 24-70-00 T1", current_batt_a: 0.58}
+      - {name: roll servo and clutch, bus: avionics, current_a: 0.45, duty: {cruise: 1}, source: "172RMM 24-70-00 T1", current_batt_a: 0.53}
+      - {name: turn coordinator, bus: essential, current_a: 0.33, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}, source: "172RMM 24-70-00 T1", current_batt_a: 0.27}
+      - {name: ADF KR 87, bus: avionics, current_a: 0.52, duty: {takeoff_climb: 1, cruise: 1, landing: 1}, source: "172RMM 24-70-00 T1", current_batt_a: 0.6}
+      # Table 2 (sem G1000), coluna 28 VDC
+      - {name: glareshield light fluorescent, bus: main, current_a: 1.0, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}, source: "172RMM 24-70-00 T2 (noite)", current_batt_a: 0.86}
+      - {name: radio lights, bus: avionics, current_a: 0.2, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1}, source: "172RMM 24-70-00 T2", current_batt_a: 0.17}
+      - {name: annunciator panel, bus: essential, current_a: 0.3, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}, source: "172RMM 24-70-00 T2 (todas acesas)", current_batt_a: 0.35}
+      - {name: avionics fan, bus: avionics, current_a: 0.5, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1}, source: "172RMM 24-70-00 T2", current_batt_a: 0.43}
+      - {name: engine and fuel gauges, bus: essential, current_a: 0.45, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}, source: "172RMM 24-70-00 T2", current_batt_a: 0.38}
+      - {name: audio panel KMA 26, bus: avionics, current_a: 1.29, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}, source: "172RMM 24-70-00 T2 (max)", current_batt_a: 1.5}
+      - {name: GPS KLN 94, bus: avionics, current_a: 1.2, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1}, source: "172RMM 24-70-00 T2", current_batt_a: 1.4}
+      - {name: transponder KT 76, bus: avionics, current_a: 0.7, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}, source: "172RMM 24-70-00 T2 (max)", current_batt_a: 0.6}
+      - {name: altitude encoder SSD120, bus: avionics, current_a: 0.23, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}, source: "172RMM 24-70-00 T2", current_batt_a: 0.2}
+      - {name: nav/com 1 KX 155A RX, bus: avionics, current_a: 0.69, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}, source: "172RMM 24-70-00 T2", current_batt_a: 0.8, radio: com1}
+      - {name: nav/com 1 KX 155A TX, bus: avionics, current_a: 6.0, duty: {taxi: 0.1, takeoff_climb: 0.1, cruise: 0.1, landing: 0.1, emergency: 0.1}, source: "172RMM 24-70-00 T2 (max), nota J (1 min/10 min)", cls: intermittent, current_batt_a: 6.0, radio: com1}
+      - {name: nav/com 2 KX 165A RX, bus: avionics, current_a: 0.69, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1}, source: "172RMM 24-70-00 T2, nota K", current_batt_a: 0.8}
+
+installation:
+  name: "GTN 650 + GMA 345 + GTX 345 + G5 (substitui nav/com 1, audio, transponder e encoder)"
+  removed: []
+  # Cada modelo do AML troca equipamentos legados diferentes: remocoes por modelo.
+  removed_by_model:
+    "Cessna 172M 1976 (14 V)": [nav/com 1 RT-328T, COM 1 legado TX, transponder RT-359A, encoding altimeter EA-401A]
+    "Cessna 172R/S convencional (28 V)": [nav/com 1 KX 155A RX, nav/com 1 KX 155A TX, transponder KT 76, altitude encoder SSD120, GPS KLN 94, audio panel KMA 26]
+  added:
+    # GTN 650: main e NAV no mesmo disjuntor (Fig. E-4): somados. Tipico 14 V: 1.6+0.60; 28 V: 0.8+0.30
+    - {name: GTN 650 main + NAV, bus: avionics, current_by_v: {14: 3.96, 28: 2.08}, breaker_by_v: {14: 7.5, 28: 5}, typical_by_v: {14: 2.20, 28: 1.10}, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}, source: "Garmin 190-01007-A3 Rev 4, Table 1-5 (max 2.8+1.16 / 1.5+0.58); Fig. E-4"}
+    - {name: GTN 650 COM RX, bus: avionics, current_by_v: {14: 0.45, 28: 0.21}, breaker_by_v: {14: 10, 28: 5}, typical_by_v: {14: 0.45, 28: 0.21}, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}, source: "Garmin 190-01007-A3 Rev 4, Table 1-5 (tipico); Fig. E-4", radio: gtn_com, circuit: GTN COM}
+    - {name: GTN 650 COM TX, bus: avionics, current_by_v: {14: 4.02, 28: 1.76}, typical_by_v: {14: 4.02, 28: 1.76}, duty: {taxi: 0.1, takeoff_climb: 0.1, cruise: 0.1, landing: 0.1, emergency: 0.1}, source: "Garmin 190-01007-A3 Rev 4, Table 1-5 (max, 10 W); duty 172RMM nota J", cls: intermittent, radio: gtn_com, circuit: GTN COM}
+    - {name: GMA 345 audio panel, bus: avionics, current_by_v: {14: 1.19, 28: 0.90}, breaker_by_v: {14: 5, 28: 5}, typical_by_v: {14: 0.83, 28: 0.43}, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}, source: "Garmin 190-01878-02 Rev 6, Table 1-7 (max sem USB); disjuntor 5 A"}
+    - {name: GTX 345 transponder ADS-B, bus: avionics, current_by_v: {14: 1.30, 28: 0.65}, typical_by_v: {14: 0.72, 28: 0.36}, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}, source: "Garmin 190-01499-02 Rev 9, Table 1-12 (max); disjuntor 3 A, Fig. D-1 (PDF p. 156)", breaker_by_v: {14: 3, 28: 3}}
+    - {name: G5 indicador de atitude, bus: avionics, current_by_v: {14: 0.25, 28: 0.125}, breaker_by_v: {14: 5, 28: 5}, typical_by_v: {14: 0.20, 28: 0.10}, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}, source: "Garmin 190-01112-10 Rev 28, Table 1-4 (max); 3.2.1"}

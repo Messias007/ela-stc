@@ -1,0 +1,32 @@
+# Rule base (method v3). Each rule: source, paragraph, metric from ela_stc.rules.metrics, limit, kind.
+# kind "criterion": analysis criterion selected for this study. None of these is asserted to be part of the
+# approved certification basis of a given aircraft; see the applicability table in docs/aplicabilidade.md.
+rules:
+  - id: R1a-carga-continua-80
+    kind: criterion
+    source: FAA AC 43.13-1B CHG 1 (2001)
+    paragraph: "Cap. 11, Sec. 3, 11-35a/e: total continuous electrical load ~80 % (rule of thumb); short intermittent loads tolerated (11-35c/d)"
+    metric: continuous_load_fraction
+    limit: 0.80
+    comparison: "<="
+  - id: R1b-carga-media-fase-80
+    kind: criterion
+    source: CASA AC 21-38 v2.1 (4.3.3, 2.1.1, 4.4.3); CAA NZ AC21-11 App. 1
+    paragraph: "average phase load including time-averaged intermittent loads; 80 % of source (CASA 4.3.3); CAA NZ uses 85 %"
+    metric: average_load_fraction
+    limit: 0.80
+    comparison: "<="
+  - id: R2-disjuntor-85
+    kind: criterion
+    source: CASA AWB 24-007; CASA AC 21-38 v2.1 4.3.3, 4.6.4
+    paragraph: "continuous load <= 85 % of breaker rating, maximum current, circuits carrying installed equipment; NOT EVALUATED if a rating is missing"
+    metric: max_breaker_load_fraction
+    limit: 0.85
+    comparison: "<="
+  - id: R3-autonomia-30min
+    kind: criterion
+    source: 14 CFR 23.1353(h) amdt 23-62 (as reference standard); CASA AC 21-38 v2.1 4.5.8, App. B
+    paragraph: "battery supplies essential loads >= 30 min with pre-shed, shed cruise and 5 min approach; not part of the original basis of the study aircraft (14 CFR 21.101(c))"
+    metric: endurance_margin_min
+    limit: 0.0
+    comparison: ">="

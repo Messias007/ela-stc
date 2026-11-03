@@ -1,0 +1,51 @@
+# EXEMPLO ILUSTRATIVO. Todos os valores (alternador, bateria, correntes, disjuntores) sao
+# PLACEHOLDERS para testar o software. Substituir por dados do manual de manutencao do
+# fabricante e dos manuais de instalacao dos equipamentos antes de qualquer uso no artigo.
+aml:
+  - model: "Modelo A (familia C172, 28 V)"
+    tcds: "PLACEHOLDER"
+    cert_basis: "CAR 3 (PLACEHOLDER)"
+    voltage: 28
+    alternator_a: 60
+    battery: {capacity_ah: 13.0, peukert_n: 1.2, soh: 0.8, temp_factor: 0.9}
+    buses: [{name: main}, {name: avionics}, {name: essential, essential: true}]
+    baseline_loads:
+      - {name: luzes de navegacao, bus: main, current_a: 3.0, breaker_a: 5, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1}}
+      - {name: farol de pouso, bus: main, current_a: 6.0, breaker_a: 10, duty: {takeoff_climb: 1, landing: 1}}
+      - {name: aquecimento do pitot, bus: main, current_a: 7.0, breaker_a: 10, duty: {cruise: 0.3}}
+      - {name: radio COM/NAV legado 1, bus: avionics, current_a: 1.2, breaker_a: 5, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}}
+      - {name: transmissao COM legado 1, bus: avionics, current_a: 4.0, breaker_a: 5, duty: {taxi: 0.1, takeoff_climb: 0.2, cruise: 0.1, landing: 0.2, emergency: 0.1}}
+      - {name: radio COM/NAV legado 2, bus: avionics, current_a: 1.2, breaker_a: 5, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1}}
+      - {name: transponder legado, bus: avionics, current_a: 1.5, breaker_a: 5, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}}
+      - {name: painel de audio, bus: avionics, current_a: 0.8, breaker_a: 5, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}}
+      - {name: instrumentos do motor, bus: essential, current_a: 1.0, breaker_a: 5, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}}
+      - {name: flapes, bus: main, current_a: 15.0, breaker_a: 15, duty: {takeoff_climb: 0.05, landing: 0.1, emergency: 0.02}}
+      - {name: carga da bateria, bus: main, current_a: 5.0, duty: {taxi: 1, takeoff_climb: 1, cruise: 0.5}}
+  - model: "Modelo B (familia C172, alternador menor)"
+    tcds: "PLACEHOLDER"
+    cert_basis: "14 CFR 23 (PLACEHOLDER)"
+    voltage: 28
+    alternator_a: 40
+    battery: {capacity_ah: 10.0, peukert_n: 1.2, soh: 0.8, temp_factor: 0.9}
+    buses: [{name: main}, {name: avionics}, {name: essential, essential: true}]
+    baseline_loads:
+      - {name: luzes de navegacao, bus: main, current_a: 3.0, breaker_a: 5, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1}}
+      - {name: farol de pouso, bus: main, current_a: 6.0, breaker_a: 10, duty: {takeoff_climb: 1, landing: 1}}
+      - {name: aquecimento do pitot, bus: main, current_a: 7.0, breaker_a: 10, duty: {cruise: 0.3}}
+      - {name: radio COM/NAV legado 1, bus: avionics, current_a: 1.2, breaker_a: 5, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}}
+      - {name: transmissao COM legado 1, bus: avionics, current_a: 4.0, breaker_a: 5, duty: {taxi: 0.1, takeoff_climb: 0.2, cruise: 0.1, landing: 0.2, emergency: 0.1}}
+      - {name: radio COM/NAV legado 2, bus: avionics, current_a: 1.2, breaker_a: 5, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1}}
+      - {name: transponder legado, bus: avionics, current_a: 1.5, breaker_a: 5, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}}
+      - {name: painel de audio, bus: avionics, current_a: 0.8, breaker_a: 5, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}}
+      - {name: instrumentos do motor, bus: essential, current_a: 1.0, breaker_a: 5, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}}
+      - {name: flapes, bus: main, current_a: 15.0, breaker_a: 15, duty: {takeoff_climb: 0.05, landing: 0.1, emergency: 0.02}}
+      - {name: carga da bateria, bus: main, current_a: 5.0, duty: {taxi: 1, takeoff_climb: 1, cruise: 0.5}}
+
+installation:
+  name: "Retrofit glass cockpit ilustrativo (PFD + navegador GPS + transponder ADS-B)"
+  removed: [radio COM/NAV legado 1, transmissao COM legado 1, transponder legado]
+  added:
+    - {name: PFD/MFD, bus: avionics, current_a: 3.5, breaker_a: 5, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}}
+    - {name: navegador GPS/NAV/COM, bus: avionics, current_a: 2.0, breaker_a: 5, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}}
+    - {name: transmissao GPS/NAV/COM, bus: avionics, current_a: 5.0, breaker_a: 7.5, duty: {taxi: 0.1, takeoff_climb: 0.2, cruise: 0.1, landing: 0.2, emergency: 0.1}}
+    - {name: transponder ADS-B, bus: avionics, current_a: 1.8, breaker_a: 5, duty: {taxi: 1, takeoff_climb: 1, cruise: 1, landing: 1, emergency: 1}}

@@ -1,0 +1,20 @@
+{
+  "title": "ELA-STC: compliance-oriented electrical load analysis for multi-model AML-STC avionics installations",
+  "upload_type": "software",
+  "version": "0.3.0",
+  "license": "MIT",
+  "creators": [
+    {
+      "name": "de Melo, Messias Silva",
+      "orcid": "0009-0002-9901-4826"
+    }
+  ],
+  "keywords": [
+    "electrical load analysis",
+    "supplemental type certificate",
+    "approved model list",
+    "general aviation",
+    "battery endurance"
+  ],
+  "description": "Open-source framework that evaluates one avionics equipment package against every model of an AML-STC with explicit analysis criteria (FAA AC 43.13-1B continuous load, CASA AC 21-38 average phase load, CASA AWB 24-007 breaker loading per circuit, 30 min battery endurance as reference criterion), exclusive radio receive/transmit states, emergency endurance at battery voltage by sequential depletion (CASA method and Peukert with separate state of health, state of charge and temperature), one-at-a-time sensitivity of method choices, Monte Carlo of physical variability, a browser version and a formula spreadsheet generator. Includes the Cessna 172 (14 V and 28 V) case study. Results indicate whether selected analysis criteria are met; they are not a finding of compliance with an approved certification basis."
+}

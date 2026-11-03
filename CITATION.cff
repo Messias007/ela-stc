@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "ELA-STC: compliance-oriented electrical load analysis for multi-model AML-STC avionics installations"
+version: 0.3.0
+date-released: 2026-11-03
+license: MIT
+authors:
+  - given-names: "Messias Silva"
+    family-names: "de Melo"
+    orcid: "https://orcid.org/0009-0002-9901-4826"
+keywords: [electrical load analysis, supplemental type certificate, approved model list, general aviation, battery endurance]
+repository-code: "https://github.com/Messias007/ela-stc"

@@ -10,3 +10,11 @@ authors:
     orcid: "https://orcid.org/0009-0002-9901-4826"
 keywords: [electrical load analysis, supplemental type certificate, approved model list, general aviation, battery endurance]
 repository-code: "https://github.com/Messias007/ela-stc"
+doi: "10.5281/zenodo.23905632"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.23905631"
+    description: "Concept DOI (all versions)"
+  - type: doi
+    value: "10.5281/zenodo.23905632"
+    description: "Version 0.3.0"

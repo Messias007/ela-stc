@@ -1,6 +1,6 @@
 # ELA-STC
 
-[![tests](https://github.com/Messias007/ela-stc/actions/workflows/tests.yml/badge.svg)](https://github.com/Messias007/ela-stc/actions/workflows/tests.yml)
+[![tests](https://github.com/Messias007/ela-stc/actions/workflows/tests.yml/badge.svg)](https://github.com/Messias007/ela-stc/actions/workflows/tests.yml) [![DOI](https://zenodo.org/badge/1443774899.svg)](https://doi.org/10.5281/zenodo.23905631)
 
 Open-source, compliance-oriented electrical load analysis (ELA) for avionics installations approved through approved model list supplemental type certificates (AML-STC) in small airplanes. One added equipment package is evaluated against every model of the list, per bus, circuit and flight phase, and every check cites its source.
 
@@ -60,7 +60,7 @@ Code comments and some outputs are in Portuguese.
 
 ## Citation
 
-See `CITATION.cff`. Paper: M. S. de Melo, "A Compliance-Oriented Electrical Load Analysis Framework for Multi-Model Supplemental Type Certification of General Aviation Avionics Installations" (submitted to *Aerospace*).
+See `CITATION.cff`. Software: version 0.3.0, used in the paper, is archived at https://doi.org/10.5281/zenodo.23905632 (all versions: https://doi.org/10.5281/zenodo.23905631). Paper: M. S. de Melo, "A Compliance-Oriented Electrical Load Analysis Framework for Multi-Model Supplemental Type Certification of General Aviation Avionics Installations" (submitted to *Aerospace*).
 
 ## License
 
